@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página com Jogo da Cobrinha</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1, #gameTitle {
+            font-size: 2.5em;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .spacer {
+            height: 50px;
+        }
+
+        .content, .game-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 900px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .content img {
+            width: 150px;
+            height: auto;
+            margin: 0 20px;
+        }
+
+        .text {
+            font-size: 1.2em;
+            color: #555;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .play-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .play-button:hover {
+            background-color: #218838;
+        }
+
+        canvas {
+            background-color: #000;
+            border: 5px solid #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="pageTitle">Projeto de vida</h1>
+    <div class="spacer"></div>
+
+    <div class="content" id="pageContent">
+        <img src="Snake.jpg" alt="Imagem à esquerda">
+        <p class="text">
+            Como estudantes interessados em ingressar no curso de Análise e Desenvolvimento de Sistemas (ADS), desenvolvemos este jogo da cobrinha como uma forma de explorar o mundo da programação e do desenvolvimento de jogos.
+        </p>
+        <img src="Snake.jpg" alt="Imagem à direita">
+    </div>
+
+    <div class="button-container">
+        <button class="play-button" onclick="startGame()">Play</button>
+    </div>
+
+    
+    <div id="gameContainer" class="game-container" style="display: none;">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <script>
+        function startGame() {
+            
+            document.getElementById('pageTitle').innerText = 'The Game';
+            document.getElementById('pageContent').innerText = 'WSDA';
+            document.querySelector('.play-button').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'flex';
+            
+            
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const box = 20;
+            let snake = [{ x: 9 * box, y: 10 * box }];
+            let direction = 'RIGHT';
+            let food = {
+                x: Math.floor(Math.random() * 20) * box,
+                y: Math.floor(Math.random() * 20) * box
+            };
+            let score = 0;
+
+            
+            document.addEventListener('keydown', event => {
+                if ((event.key === 'ArrowLeft' || event.key === 'a') && direction !== 'RIGHT') direction = 'LEFT';
+                if ((event.key === 'ArrowUp' || event.key === 'w') && direction !== 'DOWN') direction = 'UP';
+                if ((event.key === 'ArrowRight' || event.key === 'd') && direction !== 'LEFT') direction = 'RIGHT';
+                if ((event.key === 'ArrowDown' || event.key === 's') && direction !== 'UP') direction = 'DOWN';
+            });
+
+            function drawGame() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                
+                ctx.fillStyle = 'red';
+                ctx.fillRect(food.x, food.y, box, box);
+
+                
+                ctx.fillStyle = 'lime';
+                for (let i = 0; i < snake.length; i++) {
+                    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                }
+
+                
+                let snakeX = snake[0].x;
+                let snakeY = snake[0].y;
+
+                if (direction === 'LEFT') snakeX -= box;
+                if (direction === 'UP') snakeY -= box;
+                if (direction === 'RIGHT') snakeX += box;
+                if (direction === 'DOWN') snakeY += box;
+
+                // Se a cobra come a comida
+                if (snakeX === food.x && snakeY === food.y) {
+                    score++;
+                    food = {
+                        x: Math.floor(Math.random() * 20) * box,
+                        y: Math.floor(Math.random() * 20) * box
+                    };
+                } else {
+                    snake.pop();
+                }
+
+                let newHead = { x: snakeX, y: snakeY };
+
+                
+                if (
+                    snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height ||
+                    snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
+                ) {
+                    clearInterval(game);
+                    alert('Game Over! Pontuação: ' + score);
+                    location.reload();
+                }
+
+                snake.unshift(newHead);
+            }
+
+            const game = setInterval(drawGame, 100);
+        }
+    </script>
+</body>
+</html>
